@@ -1,0 +1,66 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-website-config
+  namespace: student-apps
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html>
+    <head><title>GitOps Demo</title></head>
+    <body style="background-color: #2d3436; color: white; text-align: center; padding-top: 50px;">
+      <h1>Hello Class 1125!</h1>
+      <p>Deployed via ArgoCD</p>
+    </body>
+    </html>
+	
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: html-app
+  labels:
+    app: html-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: html-app
+  template:
+    metadata:
+      labels:
+        app: html-app
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: html-volume
+          mountPath: /usr/share/nginx/html
+        resources:
+          requests:
+            memory: "32Mi"
+            cpu: "100m"
+          limits:
+            memory: "64Mi"
+            cpu: "200m"
+      volumes:
+      - name: html-volume
+        configMap:
+          name: html-content
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: html-app-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: html-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
