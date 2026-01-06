@@ -13,7 +13,6 @@ data:
       <p>Deployed via ArgoCD</p>
     </body>
     </html>
-	
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -50,7 +49,6 @@ spec:
       - name: html-volume
         configMap:
           name: html-content
-
 ---
 apiVersion: v1
 kind: Service
